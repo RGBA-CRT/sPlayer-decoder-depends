@@ -6,4 +6,4 @@
 	url = https://gitlab.xiph.org/xiph/ogg.git
 [submodule "mp3lame/lame"]
 	path = mp3lame/lame
-	url = https://github.com/lameproject/lame.git
+	url = git@github.com:RGBA-CRT/lame.git
