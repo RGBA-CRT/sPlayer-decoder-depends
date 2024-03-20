@@ -16,19 +16,23 @@ CMAKE_OPT="-DCMAKE_CXX_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_C_COMPILER_LAUNCHER=
 
 function vorbis(){
 	pushd vorbis
+	git apply ../vorbis-*.patch
 	mkdir -p $BUILD_DIR
 	cd $BUILD_DIR
 	cmake -G ${GEN} $CMAKE_OPT ../
 	ninja install
+	git reset --hard
 	popd
 }
 
 function ogg(){
 	pushd ogg
+	git apply ../ogg-*.patch
 	mkdir -p $BUILD_DIR
 	cd $BUILD_DIR
 	cmake -G ${GEN} $CMAKE_OPT ../
 	ninja install
+	git reset --hard
 	popd
 }
 

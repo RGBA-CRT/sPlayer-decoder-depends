@@ -11,10 +11,10 @@ def kill_tls(infile):
 
 	# print(pe.OPTIONAL_HEADER)
 	tls_dir = pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_TLS']]
-	print(tls_dir)
+	#print(tls_dir)
 	tls_dir.Size = 0
 	tls_dir.VirtualAddress = 0
-	print(tls_dir)
+	#print(tls_dir)
 
 	# def find_section_idx(name):
 	# 	tls_sec_idx=0
@@ -33,6 +33,8 @@ def kill_tls(infile):
 	# print(pe.sections[tls_sec_index])
 
 	pe.write(infile)
+
+	print("TLS callback removed:",infile)
 
 
 args = sys.argv[1:]
