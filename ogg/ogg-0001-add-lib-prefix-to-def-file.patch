@@ -1,0 +1,25 @@
+From 6710f5b5447e56bbff4feeede24752484a1cacea Mon Sep 17 00:00:00 2001
+From: RGBA-CRT <rgba3crt1p@gmail.com>
+Date: Thu, 21 Mar 2024 00:59:52 +0900
+Subject: [PATCH] add lib prefix to def file.
+
+---
+ win32/ogg.def | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/win32/ogg.def b/win32/ogg.def
+index 030b644..a48553b 100644
+--- a/win32/ogg.def
++++ b/win32/ogg.def
+@@ -2,7 +2,7 @@
+ ; ogg.def
+ ; List of exported functions for Windows builds.
+ ;
+-LIBRARY ogg
++LIBRARY "libogg"
+ EXPORTS
+ ;
+ oggpack_writeinit
+-- 
+2.32.0
+
