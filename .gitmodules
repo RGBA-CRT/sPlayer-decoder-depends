@@ -4,3 +4,6 @@
 [submodule "ogg/ogg"]
 	path = ogg/ogg
 	url = https://gitlab.xiph.org/xiph/ogg.git
+[submodule "mp3lame/lame"]
+	path = mp3lame/lame
+	url = https://github.com/lameproject/lame.git
