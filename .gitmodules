@@ -7,3 +7,12 @@
 [submodule "mp3lame/lame"]
 	path = mp3lame/lame
 	url = git@github.com:RGBA-CRT/lame.git
+[submodule "vgmstream/vgmstream"]
+	path = vgmstream/vgmstream
+	url = git@github.com:RGBA-CRT/vgmstream-dll.git
+[submodule "vgmstream/ffmpeg"]
+	path = vgmstream/ffmpeg
+	url = https://git.ffmpeg.org/ffmpeg.git
+[submodule "vgmstream/opus"]
+	path = vgmstream/opus
+	url = https://github.com/xiph/opus.git
