@@ -12,7 +12,7 @@
 	url = git@github.com:RGBA-CRT/vgmstream-dll.git
 [submodule "vgmstream/ffmpeg"]
 	path = vgmstream/ffmpeg
-	url = https://git.ffmpeg.org/ffmpeg.git
+	url = git@github.com:RGBA-CRT/FFmpeg.git
 [submodule "vgmstream/opus"]
 	path = vgmstream/opus
 	url = https://github.com/xiph/opus.git
