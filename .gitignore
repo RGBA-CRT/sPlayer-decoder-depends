@@ -1,2 +1,4 @@
 tools/upx/
 */.*/
+.dust/
+tools/external
