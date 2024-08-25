@@ -1,25 +1,24 @@
-#!/bin/bash
-export CC="i686-w64-mingw32-gcc"
-export CPP="i686-w64-mingw32-g++"
+#!/bin/bash -e 
+CURDIR=$(cd "$(dirname "$0")" && pwd)
+TOOL_DIR="$(cd $CURDIR/../tools; pwd)"
+source ${TOOL_DIR}/config.source
+
 LUNCHER="ccache"
 GEN="Ninja"
 GENCMD="ninja"
 BUILD_DIR=".build"
 BUILD_MODE="Release"
 CMAKE_OPT="-DBUILD_SHARED_LIBS=1"
-CURDIR=$(cd "$(dirname "$0")" && pwd)
 INSTALL_DIR="$CURDIR/.install"
-TOOL_DIR="$(cd $CURDIR/../tools; pwd)"
 
-CMAKE_OPT="-DCMAKE_CXX_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_C_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_TOOLCHAIN_FILE="${TOOL_DIR}/toolchain.cmake" -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_PREFIX_PATH=${INSTALL_DIR} ${CMAKE_OPT} -DCMAKE_BUILD_TYPE=${BUILD_MODE}"
-# CMAKE_OPT="-DCMAKE_SYSTEM_NAME=Windows -DCMAKE_CXX_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_C_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CPP} -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} ${CMAKE_OPT}"
-
+CMAKE_OPT="-DCMAKE_CXX_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_C_COMPILER_LAUNCHER=${LUNCHER} -DCMAKE_TOOLCHAIN_FILE=${TOOL_DIR}/toolchain.cmake -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} -DCMAKE_PREFIX_PATH=${INSTALL_DIR} ${CMAKE_OPT} -DCMAKE_BUILD_TYPE=${BUILD_MODE} "
+echo ${CMAKE_OPT}
 function vorbis(){
 	pushd vorbis
-	git apply ../vorbis-*.patch
+	git apply ../vorbis-*.patch | echo
 	mkdir -p $BUILD_DIR
 	cd $BUILD_DIR
-	cmake -G ${GEN} $CMAKE_OPT ../
+	cmake -G ${GEN} $CMAKE_OPT -DCMAKE_C_FLAGS="${COMMON_CFLAGS}" ../
 	ninja install
 	git reset --hard
 	popd
@@ -27,10 +26,10 @@ function vorbis(){
 
 function ogg(){
 	pushd ogg
-	git apply ../ogg-*.patch
+	git apply ../ogg-*.patch | echo
 	mkdir -p $BUILD_DIR
 	cd $BUILD_DIR
-	cmake -G ${GEN} $CMAKE_OPT ../
+	cmake -G ${GEN} $CMAKE_OPT -DCMAKE_C_FLAGS="${COMMON_CFLAGS}" ../
 	ninja install
 	git reset --hard
 	popd
