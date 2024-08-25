@@ -16,3 +16,6 @@
 [submodule "vgmstream/opus"]
 	path = vgmstream/opus
 	url = https://github.com/xiph/opus.git
+[submodule "nsf/nezplug"]
+	path = nsf/nezplug
+	url = https://github.com/RGBA-CRT/nezplug.git
