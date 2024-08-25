@@ -1,15 +1,18 @@
-#!/bin/bash
-# configureのCFLAGSはDLLに効かないので仕方なくここで効かせる
-export CC="ccache i686-w64-mingw32-gcc -O2"
-export CXX="ccache i686-w64-mingw32-g++"
+#!/bin/bash -e
 CURDIR=$(cd "$(dirname "$0")" && pwd)
-INSTALL_DIR="$CURDIR/.install"
 TOOL_DIR="$(cd $CURDIR/../tools; pwd)"
+source ${TOOL_DIR}/config.source
+INSTALL_DIR="$CURDIR/.install"
+
+# configureのCFLAGSはDLLに効かないので仕方なくここで効かせる
+export CC="ccache ${COMPILER_FAMILY}-gcc -O3 -march=i486 -mtune=pentium"
+export CXX="ccache ${COMPILER_FAMILY}-g++"
 
 function lame_pre_process(){
+	rm -r .install
 	pushd lame
 	autoconf
-	LIBMP3LAME_LDADD="-static-libgcc -static-libstdc++" ./configure --build=x86_64-linux-gnu --host=i686-w64-mingw32 --prefix=${INSTALL_DIR}
+	LIBMP3LAME_LDADD="-static-libgcc -static-libstdc++ -flto" ./configure --build=x86_64-linux-gnu --host=${COMPILER_FAMILY} --prefix=${INSTALL_DIR} --enable-nasm
 	popd
 }
 function lame_compile(){
@@ -27,7 +30,7 @@ function lame_post_process(){
 function post_proces(){
 	pushd $INSTALL_DIR
 	${TOOL_DIR}/post_process_dll.sh bin/*.dll
-	mv bin/libmp3lame-0.dll  bin/libmp3lame.dll 
+	cp bin/libmp3lame-0.dll  bin/libmp3lame.dll 
 	popd
 }
 
