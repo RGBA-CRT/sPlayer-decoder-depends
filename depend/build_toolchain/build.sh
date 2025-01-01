@@ -174,7 +174,7 @@ build_binutils
 # Add path (required for building gcc later)
 export PATH="$PATH:$DEST/bin"
 
-# build_header
+build_header
 build_gcc
 build_crt
 install_gcc

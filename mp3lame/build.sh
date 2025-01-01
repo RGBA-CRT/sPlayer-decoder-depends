@@ -9,7 +9,7 @@ export CC="ccache ${COMPILER_FAMILY}-gcc -O3 -march=i486 -mtune=pentium"
 export CXX="ccache ${COMPILER_FAMILY}-g++"
 
 function lame_pre_process(){
-	rm -r .install
+	rm -r .install -f
 	pushd lame
 	autoconf
 	LIBMP3LAME_LDADD="-static-libgcc -static-libstdc++ -flto" ./configure --build=x86_64-linux-gnu --host=${COMPILER_FAMILY} --prefix=${INSTALL_DIR} --enable-nasm
