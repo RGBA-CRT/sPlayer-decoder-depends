@@ -30,6 +30,8 @@ mkdir -p $DEST
 
 cd $SRC
 
+# sudo apt install wget bzip2 xz-utils gcc g++ make ccache  g++-mingw-w64-i686-win32 gcc-mingw-w64-i686-win32
+
 # mingwにc52f1eb09901e038ceb7012730e7cf3395d65a78が入っていないバージョンを探す
 # 　ちなみに、現在まだタグがついていないが上記をrevertする修正が出ている
 #   https://sourceforge.net/p/mingw-w64/mingw-w64/ci/4953f7746a9aca7ae065fa9aa77eb9d02d0ed752/
@@ -48,12 +50,12 @@ function ret_check(){
 function get_src(){
     # Get sources
     wget http://ftp.gnu.org/gnu/binutils/${BINUTILS_RELEASE}.tar.bz2
-    tar xvjf ${BINUTILS_RELEASE}.tar.bz2
+    tar xjf ${BINUTILS_RELEASE}.tar.bz2
     wget https://jaist.dl.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/${MINGW_RELEASE}.tar.bz2
-    tar xjvf ${MINGW_RELEASE}.tar.bz2
+    tar xjf ${MINGW_RELEASE}.tar.bz2
     wget http://ftp.gnu.org/gnu/gcc/${GCC_RELEASE}/${GCC_RELEASE}.tar.xz
     # tar --exclude="${GCC_RELEASE}/gcc/testsuite/*" --exclude="${GCC_RELEASE}/libgo/*" -xvf ${GCC_RELEASE}.tar.xz
-    tar -xvf ${GCC_RELEASE}.tar.xz
+    tar -xf ${GCC_RELEASE}.tar.xz
 }
 
 function get_binutil_dep(){
@@ -64,7 +66,7 @@ function get_binutil_dep(){
 
 # Make binutils
 function build_binutils(){
-    echo "=============== BUID binutils ==============="
+    echo "=============== BUILD binutils ==============="
     mkdir -p $BUILDROOT/binutils
     cd $BUILDROOT/binutils
     $SRC/${BINUTILS_RELEASE}/configure --prefix=$DEST --with-sysroot=$DEST --target=i686-w64-mingw32 --enable-targets=i686-w64-mingw32,x86_64-w64-mingw32 --enable-lto --enable-plugins --enable-gold --disable-werror --enable-install-libiberty #--enable-64-bit-bfd
@@ -76,7 +78,7 @@ function build_binutils(){
 
 
 function build_header(){
-    echo "=============== BUID mingw-header ==============="
+    echo "=============== BUILD mingw-header ==============="
     # Build mingw headers
     # Assumes we are building with x86_64-w64-mingw32 cross compiler!
     mkdir -p $BUILDROOT/headers
@@ -91,7 +93,7 @@ function build_header(){
 
 
 function build_gcc(){
-    echo "=============== BUID GCC ==============="
+    echo "=============== BUILD GCC ==============="
     # Multilib symlink. Not sure if this is necessary for i686.
     # ln -s $DEST/i686-w64-mingw32/lib $DEST/i686-w64-mingw32/lib64
 
@@ -109,7 +111,7 @@ function build_gcc(){
 }
 
 function build_crt(){
-    echo "=============== BUID CRT ==============="
+    echo "=============== BUILD CRT ==============="
     # Building CRT (Mingw-w64 itself)
     mkdir -p $BUILDROOT/crt
     cd $BUILDROOT/crt
