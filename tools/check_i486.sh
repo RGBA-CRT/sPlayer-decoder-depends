@@ -7,7 +7,7 @@ for f in ${LIST}; do
     echo "${CMOVES}" | head -6
     if [ $NCMOVES -gt 1 ]; then
         echo -e "detect=${NCMOVES}"
-        echo -e "WARNING: this file is built for i686 arch CPU.\n"
+        echo -e "WARNING: this file is built for i486-i586 arch CPU.\n"
         RET=-1
     fi
 done

@@ -1,7 +1,7 @@
 #!/bin/bash -e
-
 #  sudo apt install cmake ninja-build yasm pkg-config
 
+# DEBUG=1
 CURDIR=$(cd "$(dirname "$0")" && pwd)
 TOOL_DIR="$(cd $CURDIR/../tools; pwd)"
 source ${TOOL_DIR}/config.source
@@ -13,8 +13,11 @@ LUNCHER="ccache"
 GEN="Ninja"
 GENCMD="ninja"
 BUILD_DIR=".build"
-BUILD_MODE="Release"
+BUILD_MODE="Release" # 勝手にO2 O3になってしまうので使ってない（Osにしたい）
 INSTALL_DIR="$CURDIR/.install"
+if [ $DEBUG ] ; then
+	INSTALL_DIR="$CURDIR/.install_dbg"
+fi
 
 export PKG_CONFIG_PATH=${INSTALL_DIR}/lib/pkgconfig/
 export CCACHE_NODEBUG=1
@@ -30,7 +33,11 @@ VGMSTREAM_CMAKE_OPT="${VGMSTREAM_CMAKE_OPT} -DBUILD_STATIC=ON"
 VGMSTREAM_CMAKE_OPT="${VGMSTREAM_CMAKE_OPT} -DBUILD_DLL=ON"
 VGMSTREAM_CMAKE_OPT="${VGMSTREAM_CMAKE_OPT} -DDLLTOOL=${DLLTOOL}"
 VGMSTREAM_CMAKE_OPT="${VGMSTREAM_CMAKE_OPT} -DUSE_FFMPEG=ON -DFFMPEG_PATH=${INSTALL_DIR}"
-VGMSTREAM_CFLAGS="-flto -ffat-lto-objects -ffunction-sections -fdata-sections -Wl,--gc-sections -Os -momit-leaf-frame-pointer"
+if [ $DEBUG ] ; then
+	VGMSTREAM_CFLAGS="-O0 -g"
+else
+	VGMSTREAM_CFLAGS="-flto -ffat-lto-objects -ffunction-sections -fdata-sections -Wl,--gc-sections -momit-leaf-frame-pointer -Os"
+fi
 
 # i586向けにcmoveを除去するための設定。
 # 全部は除去できない（最適化によって生成されてしまう）ので一部処理で死ぬかも。その場合は以下検討。
@@ -62,6 +69,13 @@ function ffmpeg_configure(){
 	echo $FFMPEG_OPTIONS
 	echo "PKG=${PKG_CONFIG_PATH}"
 	# sed -i -e "s/require_pkg_config libopus/: #require_pkg_config libopus/g" configure
+	
+	if [ $DEBUG ] ; then
+		FFMPEG_OPTIMIZE_OPT=""
+		FFMPEG_CFLAGS="${FFMPEG_CFLAGS} -O0 -g"
+	else
+		FFMPEG_OPTIMIZE_OPT="--enable-small --enable-lto"
+	fi
 	sh ./configure $FFMPEG_OPTIONS \
 		--target-os=mingw32 \
 		--enable-cross-compile \
@@ -70,11 +84,12 @@ function ffmpeg_configure(){
 		--prefix=${INSTALL_DIR} \
 		--pkgconfigdir="${PKG_CONFIG_PATH}" \
 		--extra-libs="-lopus" \
-		--pkg-config=pkg-config \
-		--enable-small \
-		--enable-lto
+		--pkg-config=pkg-config ${FFMPEG_OPTIMIZE_OPT} \
+		--disable-asm
 
-	# Windows95のmsvcrt向けにarigned mallocを無効化する
+	# Windows95のmsvcrt向けにarigned mallocを無効化する。
+	# mallocでアラインが取れないとSSEなどSIMD命令が落ちる。このためconfigureに--disable-asmを指定して拡張命令の使用をOFFにしている。
+	# 音声Onlyかつ1倍速で処理できれば良いのでそこまでの最適化は不要という想定の下の割り切り。
 	sed -i "s/define HAVE_ALIGNED_MALLOC 1/define HAVE_ALIGNED_MALLOC 0/" config.*
 	popd
 }
@@ -85,11 +100,15 @@ function ffmpeg_build(){
 	popd
 }
 function post_proces(){
-	pushd $INSTALL_DIR
+	pushd ${INSTALL_DIR}
 	${TOOL_DIR}/post_process_dll.sh bin/vgmstream.dll
-	python3 ${TOOL_DIR}/exe-tls-remover.py bin/avcodec-vgmstream-59.dll
-	python3 ${TOOL_DIR}/exe-tls-remover.py bin/avutil-vgmstream-57.dll
-	python3 ${TOOL_DIR}/exe-tls-remover.py bin/avformat-vgmstream-59.dll
+	# python3 ${TOOL_DIR}/exe-tls-remover.py bin/avcodec-vgmstream-59.dll
+	# python3 ${TOOL_DIR}/exe-tls-remover.py bin/avutil-vgmstream-57.dll
+	# python3 ${TOOL_DIR}/exe-tls-remover.py bin/avformat-vgmstream-59.dll
+	${TOOL_DIR}/post_process_dll.sh bin/avcodec-vgmstream-59.dll
+	${TOOL_DIR}/post_process_dll.sh bin/avutil-vgmstream-57.dll
+	${TOOL_DIR}/post_process_dll.sh bin/avformat-vgmstream-59.dll
+	${TOOL_DIR}/post_process_dll.sh bin/swresample-vgmstream-4.dll
 	popd
 }
 
@@ -99,5 +118,15 @@ if [ "$1" != "--skip-deps" ]; then
 	ffmpeg_build
 fi
 vgmstream
-post_proces
+
+if [ $DEBUG ] ; then
+	cp ffmpeg/libavcodec/avcodec-vgmstream-59.dll ${INSTALL_DIR}/bin
+	cp ffmpeg/libavformat/avformat-vgmstream-59.dll ${INSTALL_DIR}/bin
+	cp ffmpeg/libavcodec/avcodec-vgmstream-59.dll ${INSTALL_DIR}/bin
+	cp ffmpeg/libavcodec/avcodec-vgmstream-59.dll ${INSTALL_DIR}/bin
+	cp vgmstream/${BUILD_DIR}/export_dll/vgmstream.dll ${INSTALL_DIR}/bin
+	
+else
+	post_proces
+fi
 
