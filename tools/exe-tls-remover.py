@@ -3,6 +3,16 @@ import sys
 import pefile
 import shutil
 
+def find_section_idx(pe, name):
+	tls_sec_idx=0
+	for section in pe.sections:
+		section_name = section.Name.decode('ascii').replace("\x00","")
+		#print(tls_sec_idx,"'",bytes(section_name, "utf-8"),"'",".tls"==section_name)
+		if name == section_name:
+			#print("TLS section found: ", tls_sec_idx)
+			break
+		tls_sec_idx = tls_sec_idx+1
+	return tls_sec_idx
 
 def kill_tls(infile):
 	shutil.copyfile(infile, infile+".org")
@@ -16,21 +26,12 @@ def kill_tls(infile):
 	tls_dir.VirtualAddress = 0
 	#print(tls_dir)
 
-	# def find_section_idx(name):
-	# 	tls_sec_idx=0
-	# 	for section in pe.sections:
-	# 		section_name = section.Name.decode('ascii').replace("\x00","")
-	# 		#print(tls_sec_idx,"'",bytes(section_name, "utf-8"),"'",".tls"==section_name)
-	# 		if name == section_name:
-	# 			#print("TLS section found: ", tls_sec_idx)
-	# 			break
-	# 		tls_sec_idx = tls_sec_idx+1
-	# 	return tls_sec_idx
-	# tls_sec_index = find_section_idx(".tls")
-	# print(type(pe.sections))
+	# tls_sec_index = find_section_idx(pe, ".tls")
+	# # print(type(pe.sections))
+	# print("section index=",tls_sec_index)
 	# print(pe.sections[tls_sec_index])
 	# del pe.sections[tls_sec_index]
-	# print(pe.sections[tls_sec_index])
+	# # print(pe.sections[tls_sec_index])
 
 	pe.write(infile)
 

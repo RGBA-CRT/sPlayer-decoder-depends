@@ -12,6 +12,10 @@ My build environment for audio decoder.
 
 上記ポリシーでパッチを当てます。
 
+# Build
+- WSL1 & ubuntu
+- todo...
+
 # Licence
 - このリポジトリに入っているスクリプト類はMITライセンスです。
 - 参照先(git submoduleの先)のライブラリ、パッチはオリジナルのライセンスに従います。
